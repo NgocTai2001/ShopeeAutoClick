@@ -4,3 +4,9 @@ local.properties
 build/
 captures/
 *.iml
+backend/service_account.json
+backend/.env
+backend/.venv/
+backend/__pycache__/
+backend/*.log
+*.pyc

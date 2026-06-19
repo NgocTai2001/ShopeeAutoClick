@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F8FA"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textColor="@color/text_primary"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvAccessibilityStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Access: checking"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvServiceStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Service: off"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvCurrentLink"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Link: -"
+            android:textColor="@color/text_secondary"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tvWaitTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Wait: -"
+            android:textColor="@color/text_secondary"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tvTaskStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Task: idle"
+            android:textColor="@color/text_secondary"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tvLog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_log_panel"
+            android:padding="12dp"
+            android:text="Log: ready"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnAccessibilitySettings"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_button_secondary"
+            android:drawableStart="@drawable/ic_accessibility_24"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/text_primary"
+            android:gravity="center"
+            android:minHeight="52dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:stateListAnimator="@null"
+            android:text="Access"
+            android:textAllCaps="false"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnStartService"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_primary"
+                android:drawableStart="@drawable/ic_play_24"
+                android:drawablePadding="8dp"
+                android:drawableTint="@color/white"
+                android:gravity="center"
+                android:minHeight="52dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:stateListAnimator="@null"
+                android:text="Start"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="1dp" />
+
+            <Button
+                android:id="@+id/btnStopService"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_danger"
+                android:drawableStart="@drawable/ic_stop_24"
+                android:drawablePadding="8dp"
+                android:drawableTint="@color/white"
+                android:gravity="center"
+                android:minHeight="52dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:stateListAnimator="@null"
+                android:text="Stop"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnTestClick"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_button_secondary"
+            android:drawableStart="@drawable/ic_touch_24"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/text_primary"
+            android:gravity="center"
+            android:minHeight="52dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:stateListAnimator="@null"
+            android:text="Test"
+            android:textAllCaps="false"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</ScrollView>

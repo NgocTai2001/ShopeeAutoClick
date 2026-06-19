@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">ShopeeAutoClick</string>
+    <string name="app_name">Shopee Live Auto Click Assistant</string>
+    <string name="accessibility_service_label">Shopee Auto Click Accessibility</string>
+    <string name="accessibility_service_description">Allows this app to perform configured test clicks after opening a pending live task.</string>
 </resources>
