@@ -1,6 +1,7 @@
 package com.example.shopeeautoclick;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -27,8 +29,10 @@ public class MainActivity extends Activity {
     private TextView tvWaitTime;
     private TextView tvTaskStatus;
     private TextView tvLog;
+    private Button btnAccessibilitySettings;
 
     private boolean receiverRegistered;
+    private boolean accessibilityPromptShown;
 
     private final BroadcastReceiver statusReceiver = new BroadcastReceiver() {
         @Override
@@ -45,6 +49,7 @@ public class MainActivity extends Activity {
         initViews();
         setupButtons();
         updateAccessibilityStatus(true);
+        maybeShowAccessibilityPrompt();
     }
 
     @Override
@@ -72,18 +77,15 @@ public class MainActivity extends Activity {
         tvWaitTime = findViewById(R.id.tvWaitTime);
         tvTaskStatus = findViewById(R.id.tvTaskStatus);
         tvLog = findViewById(R.id.tvLog);
+        btnAccessibilitySettings = findViewById(R.id.btnAccessibilitySettings);
     }
 
     private void setupButtons() {
-        Button btnAccessibilitySettings = findViewById(R.id.btnAccessibilitySettings);
         Button btnStartService = findViewById(R.id.btnStartService);
         Button btnStopService = findViewById(R.id.btnStopService);
         Button btnTestClick = findViewById(R.id.btnTestClick);
 
-        btnAccessibilitySettings.setOnClickListener(v -> {
-            Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-            startActivity(intent);
-        });
+        btnAccessibilitySettings.setOnClickListener(v -> openAccessibilitySettings());
 
         btnStartService.setOnClickListener(v -> startMonitorService());
         btnStopService.setOnClickListener(v -> stopMonitorService());
@@ -96,19 +98,41 @@ public class MainActivity extends Activity {
                 AutoClickAccessibilityService.class
         );
 
-        tvAccessibilityStatus.setText(enabled ? "Access: on" : "Access: off");
-        tvServiceStatus.setText(TaskMonitorService.isServiceRunning()
-                ? "Service: on"
-                : "Service: off");
+        setAccessStatus(enabled);
+        setServiceStatus(TaskMonitorService.isServiceRunning());
+        btnAccessibilitySettings.setVisibility(enabled ? View.GONE : View.VISIBLE);
 
         if (enabled && autoStartService && !TaskMonitorService.isServiceRunning()) {
             startMonitorService();
         }
     }
 
+    private void maybeShowAccessibilityPrompt() {
+        if (accessibilityPromptShown || PermissionUtils.isAccessibilityServiceEnabled(
+                this,
+                AutoClickAccessibilityService.class
+        )) {
+            return;
+        }
+
+        accessibilityPromptShown = true;
+        new AlertDialog.Builder(this)
+                .setTitle("Bật Accessibility")
+                .setMessage("Cấp quyền cho Shopee Live Assistant. Quay lại app xong nó sẽ tự start.")
+                .setPositiveButton("Mở cài đặt", (dialog, which) -> openAccessibilitySettings())
+                .setNegativeButton("Để sau", null)
+                .show();
+    }
+
+    private void openAccessibilitySettings() {
+        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+        startActivity(intent);
+    }
+
     private void startMonitorService() {
         if (!PermissionUtils.isAccessibilityServiceEnabled(this, AutoClickAccessibilityService.class)) {
             tvLog.setText("Log: Enable Accessibility first");
+            maybeShowAccessibilityPrompt();
             return;
         }
 
@@ -119,7 +143,7 @@ public class MainActivity extends Activity {
             } else {
                 startService(intent);
             }
-            tvServiceStatus.setText("Service: starting");
+            setServiceStatusWorking("Service: starting");
             tvLog.setText("Log: Start requested");
         } catch (Exception e) {
             AppLogger.e(TAG, "Cannot start TaskMonitorService", e);
@@ -132,7 +156,7 @@ public class MainActivity extends Activity {
             Intent intent = new Intent(this, TaskMonitorService.class);
             intent.setAction(TaskMonitorService.ACTION_STOP);
             startService(intent);
-            tvServiceStatus.setText("Service: stopping");
+            setServiceStatusWorking("Service: stopping");
             tvLog.setText("Log: Stop requested");
         } catch (Exception e) {
             AppLogger.e(TAG, "Cannot stop TaskMonitorService", e);
@@ -184,7 +208,7 @@ public class MainActivity extends Activity {
                 TaskMonitorService.EXTRA_SERVICE_RUNNING,
                 TaskMonitorService.isServiceRunning()
         );
-        tvServiceStatus.setText(running ? "Service: on" : "Service: off");
+        setServiceStatus(running);
 
         String currentLink = intent.getStringExtra(TaskMonitorService.EXTRA_CURRENT_LINK);
         if (currentLink != null) {
@@ -207,6 +231,41 @@ public class MainActivity extends Activity {
         if (log != null) {
             tvLog.setText("Log: " + log);
         }
+    }
+
+    private void setAccessStatus(boolean enabled) {
+        tvAccessibilityStatus.setText(enabled ? "Access: on" : "Access: off");
+        applyStatusStyle(
+                tvAccessibilityStatus,
+                enabled ? R.drawable.bg_status_chip_on : R.drawable.bg_status_chip_off,
+                enabled ? R.color.success_green : R.color.danger_red
+        );
+    }
+
+    private void setServiceStatus(boolean running) {
+        tvServiceStatus.setText(running ? "Service: on" : "Service: off");
+        applyStatusStyle(
+                tvServiceStatus,
+                running ? R.drawable.bg_status_chip_on : R.drawable.bg_status_chip_off,
+                running ? R.color.success_green : R.color.danger_red
+        );
+    }
+
+    private void setServiceStatusWorking(String text) {
+        tvServiceStatus.setText(text);
+        applyStatusStyle(tvServiceStatus, R.drawable.bg_status_chip_waiting, R.color.brand_orange);
+    }
+
+    private void applyStatusStyle(TextView view, int backgroundRes, int textColorRes) {
+        view.setBackgroundResource(backgroundRes);
+        view.setTextColor(getColorCompat(textColorRes));
+    }
+
+    private int getColorCompat(int colorRes) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return getColor(colorRes);
+        }
+        return getResources().getColor(colorRes);
     }
 
 }

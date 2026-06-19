@@ -5,6 +5,13 @@ import android.accessibilityservice.GestureDescription;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Path;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.Gravity;
+import android.view.View;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
@@ -17,7 +24,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class AutoClickAccessibilityService extends AccessibilityService {
     private static final String TAG = "AutoClickAccessibility";
     private static final long CLICK_CALLBACK_TIMEOUT_SECONDS = 4L;
+    private static final long CLICK_MARKER_DURATION_MILLIS = 500L;
     private static volatile AutoClickAccessibilityService instance;
+
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private WindowManager windowManager;
 
     public static AutoClickAccessibilityService getInstance() {
         return instance;
@@ -27,6 +38,7 @@ public class AutoClickAccessibilityService extends AccessibilityService {
     protected void onServiceConnected() {
         super.onServiceConnected();
         instance = this;
+        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         AppLogger.d(TAG, "Accessibility service connected");
     }
 
@@ -63,6 +75,8 @@ public class AutoClickAccessibilityService extends AccessibilityService {
             AppLogger.e(TAG, "Cannot click because accessibility service is not enabled", null);
             return false;
         }
+
+        showClickMarker(x, y);
 
         Path clickPath = new Path();
         clickPath.moveTo(x, y);
@@ -116,6 +130,66 @@ public class AutoClickAccessibilityService extends AccessibilityService {
             AppLogger.e(TAG, "Click wait interrupted", e);
             return false;
         }
+    }
+
+    private void showClickMarker(int x, int y) {
+        mainHandler.post(() -> {
+            if (windowManager == null) {
+                windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+            }
+            if (windowManager == null) {
+                return;
+            }
+
+            int size = dpToPx(56);
+            View marker = new View(this);
+            marker.setAlpha(0.85f);
+            marker.setClickable(false);
+            marker.setFocusable(false);
+
+            GradientDrawable background = new GradientDrawable();
+            background.setShape(GradientDrawable.OVAL);
+            background.setColor(0x33EE4D2D);
+            background.setStroke(dpToPx(3), 0xFFEE4D2D);
+            marker.setBackground(background);
+
+            WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                    size,
+                    size,
+                    WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                            | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                    PixelFormat.TRANSLUCENT
+            );
+            params.gravity = Gravity.TOP | Gravity.START;
+            params.x = x - (size / 2);
+            params.y = y - (size / 2);
+
+            try {
+                windowManager.addView(marker, params);
+                mainHandler.postDelayed(
+                        () -> removeClickMarker(marker),
+                        CLICK_MARKER_DURATION_MILLIS
+                );
+            } catch (Exception e) {
+                AppLogger.e(TAG, "Cannot show click marker", e);
+            }
+        });
+    }
+
+    private void removeClickMarker(View marker) {
+        try {
+            if (windowManager != null && marker.getWindowToken() != null) {
+                windowManager.removeView(marker);
+            }
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Cannot remove click marker", e);
+        }
+    }
+
+    private int dpToPx(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
     }
 
     public String getActivePackageName() {

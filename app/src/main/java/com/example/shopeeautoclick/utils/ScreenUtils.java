@@ -12,8 +12,8 @@ import android.view.WindowMetrics;
 import com.example.shopeeautoclick.data.remote.RetrofitClient;
 
 public final class ScreenUtils {
-    public static final int DEFAULT_CLICK_OFFSET_RIGHT = 80;
-    public static final float DEFAULT_CLICK_Y_RATIO = 0.5f;
+    public static final int DEFAULT_CLICK_OFFSET_RIGHT = 48;
+    public static final float DEFAULT_CLICK_Y_RATIO = 0.12f;
 
     private static final String KEY_CLICK_X = "click_x";
     private static final String KEY_CLICK_Y = "click_y";

@@ -2,8 +2,13 @@
 <resources>
     <color name="brand_orange">#EE4D2D</color>
     <color name="brand_orange_pressed">#D84224</color>
+    <color name="brand_orange_soft">#FFF0EA</color>
     <color name="danger_red">#B42318</color>
     <color name="danger_red_pressed">#8F1D14</color>
+    <color name="danger_red_soft">#FEF3F2</color>
+    <color name="success_green">#087443</color>
+    <color name="success_green_soft">#EAF8F1</color>
+    <color name="panel_tint">#F8FAFC</color>
     <color name="surface">#FFFFFF</color>
     <color name="surface_pressed">#EEF2F7</color>
     <color name="stroke">#D8DEE8</color>
